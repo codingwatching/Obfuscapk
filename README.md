@@ -1,5 +1,5 @@
 > [!IMPORTANT]  
-> From 17/01/2024, the **Obfuscapk** project will be maintained by the other co-authors here. Consider this as the new official Obfuscapk repository.
+> From 17/01/2024, the Obfuscapk project will be maintained by the other co-authors here. Consider this as the **new official Obfuscapk repository**.
 > 
 
 ![Logo](https://raw.githubusercontent.com/ClaudiuGeorgiu/Obfuscapk/master/docs/logo/logo.png)
