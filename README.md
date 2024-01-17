@@ -1,11 +1,6 @@
 > [!IMPORTANT]  
-> This project is archived. Please don't contact me for support.
+> From 17/01/2024, the **Obfuscapk** project will be maintained by the other co-authors here. Consider this as the new official Obfuscapk repository.
 > 
-> Some of the most common questions are answered in
-> [FAQ](https://github.com/ClaudiuGeorgiu/Obfuscapk/blob/master/docs/FAQ.md) and
-> [troubleshooting](https://github.com/ClaudiuGeorgiu/Obfuscapk/blob/master/docs/TROUBLESHOOTING.md).
-
-
 
 ![Logo](https://raw.githubusercontent.com/ClaudiuGeorgiu/Obfuscapk/master/docs/logo/logo.png)
 
