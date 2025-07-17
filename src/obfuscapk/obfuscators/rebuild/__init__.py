@@ -1,3 +1,3 @@
 #!/usr/bin/env python3
 
-from .rebuild import Rebuild
+from obfuscapk.obfuscators.rebuild.rebuild import Rebuild

@@ -1,3 +1,3 @@
 #!/usr/bin/env python3
 
-from .lib_encryption import LibEncryption
+from obfuscapk.obfuscators.lib_encryption.lib_encryption import LibEncryption

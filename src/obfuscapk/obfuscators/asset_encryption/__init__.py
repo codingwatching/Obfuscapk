@@ -1,3 +1,3 @@
 #!/usr/bin/env python3
 
-from .asset_encryption import AssetEncryption
+from obfuscapk.obfuscators.asset_encryption.asset_encryption import AssetEncryption

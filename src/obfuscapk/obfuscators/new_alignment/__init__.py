@@ -1,3 +1,3 @@
 #!/usr/bin/env python3
 
-from .new_alignment import NewAlignment
+from obfuscapk.obfuscators.new_alignment.new_alignment import NewAlignment

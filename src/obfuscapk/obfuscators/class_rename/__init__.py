@@ -1,3 +1,3 @@
 #!/usr/bin/env python3
 
-from .class_rename import ClassRename
+from obfuscapk.obfuscators.class_rename.class_rename import ClassRename

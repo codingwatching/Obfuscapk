@@ -1,3 +1,3 @@
 #!/usr/bin/env python3
 
-from .new_signature import NewSignature
+from obfuscapk.obfuscators.new_signature.new_signature import NewSignature
