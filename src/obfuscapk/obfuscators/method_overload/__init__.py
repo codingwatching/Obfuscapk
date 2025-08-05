@@ -1,3 +1,3 @@
 #!/usr/bin/env python3
 
-from .method_overload import MethodOverload
+from obfuscapk.obfuscators.method_overload.method_overload import MethodOverload

@@ -1,3 +1,3 @@
 #!/usr/bin/env python3
 
-from .goto import Goto
+from obfuscapk.obfuscators.goto.goto import Goto

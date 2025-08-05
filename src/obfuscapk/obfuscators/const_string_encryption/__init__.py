@@ -1,3 +1,3 @@
 #!/usr/bin/env python3
 
-from .const_string_encryption import ConstStringEncryption
+from obfuscapk.obfuscators.const_string_encryption.const_string_encryption import ConstStringEncryption

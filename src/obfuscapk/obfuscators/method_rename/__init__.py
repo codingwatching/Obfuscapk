@@ -1,3 +1,3 @@
 #!/usr/bin/env python3
 
-from .method_rename import MethodRename
+from obfuscapk.obfuscators.method_rename.method_rename import MethodRename

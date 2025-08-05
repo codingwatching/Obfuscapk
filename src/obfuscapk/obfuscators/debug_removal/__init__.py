@@ -1,3 +1,3 @@
 #!/usr/bin/env python3
 
-from .debug_removal import DebugRemoval
+from obfuscapk.obfuscators.debug_removal.debug_removal import DebugRemoval

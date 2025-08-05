@@ -1,3 +1,3 @@
 #!/usr/bin/env python3
 
-from .reflection import Reflection
+from obfuscapk.obfuscators.reflection.reflection import Reflection

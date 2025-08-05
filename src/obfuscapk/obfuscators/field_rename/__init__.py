@@ -1,3 +1,3 @@
 #!/usr/bin/env python3
 
-from .field_rename import FieldRename
+from obfuscapk.obfuscators.field_rename.field_rename import FieldRename
