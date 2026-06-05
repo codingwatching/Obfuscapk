@@ -1,615 +1,444 @@
-> [!IMPORTANT]
-> This project is archived and no longer maintained.
-> 
-> Some of the most common questions are answered in
-> [FAQ](https://github.com/ClaudiuGeorgiu/Obfuscapk/blob/master/docs/FAQ.md) and
-> [troubleshooting](https://github.com/ClaudiuGeorgiu/Obfuscapk/blob/master/docs/TROUBLESHOOTING.md).
+<p align="center">
+  <img src="docs/logo/logo.png" alt="Obfuscapk logo" width="420">
+</p>
 
-![Logo](https://raw.githubusercontent.com/ClaudiuGeorgiu/Obfuscapk/master/docs/logo/logo.png)
+# Obfuscapk
 
-> A black-box obfuscation tool for Android apps.
+> A black-box obfuscation tool for Android applications.
 
-[![Codacy](https://app.codacy.com/project/badge/Grade/076af5e6284541d39679c96d16d83772)](https://www.codacy.com/gh/ClaudiuGeorgiu/Obfuscapk)
-[![Code Coverage](https://codecov.io/gh/ClaudiuGeorgiu/Obfuscapk/badge.svg)](https://codecov.io/gh/ClaudiuGeorgiu/Obfuscapk)
-[![Python Version](https://img.shields.io/badge/Python-3.7%2B-green.svg?logo=python&logoColor=white)](https://www.python.org/downloads/)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/ClaudiuGeorgiu/Obfuscapk/blob/master/LICENSE)
+[![Python](https://img.shields.io/badge/Python-3.7%2B-green.svg?logo=python&logoColor=white)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Android](https://img.shields.io/badge/Android-APK%20%7C%20AAB-brightgreen.svg?logo=android&logoColor=white)](https://developer.android.com/)
 
+Obfuscapk is a modular Python tool for obfuscating Android applications without requiring their source code. It works in a black-box fashion: it decompiles the input application with [`apktool`](https://ibotpeaches.github.io/Apktool/), applies a configurable sequence of obfuscation plugins to the decompiled `smali` code, resources and manifest, and rebuilds a new application package.
 
+This repository is the official Mobile-IoT-Security Lab fork and the current reference point for research, maintenance and community contributions around Obfuscapk.
 
-**Obfuscapk** is a modular Python tool for obfuscating Android apps without needing
-their source code, since [`apktool`](https://ibotpeaches.github.io/Apktool/) is used
-to decompile the original apk file and to build a new application, after applying some
-obfuscation techniques on the decompiled `smali` code, resources and manifest. The
-obfuscated app retains the same functionality as the original one, but the differences
-under the hood sometimes make the new application very different from the original
-(e.g., to signature-based antivirus software).
+## Responsible use
 
-### :new: Android App Bundle support :new:
+Obfuscapk is a research and education tool for studying Android obfuscation, program transformation, reverse engineering, malware analysis robustness and application protection. Use it only on applications you own, are authorized to analyze, or are allowed to transform for research purposes.
 
-Obfuscapk is adding support for
-[Android App Bundles](https://developer.android.com/guide/app-bundle) (aab files) by
-using [BundleDecompiler](https://github.com/TamilanPeriyasamy/BundleDecompiler) (see
-[#121](https://github.com/ClaudiuGeorgiu/Obfuscapk/pull/121)). In order to use this new
-feature, download the latest version of BundleDecompiler available from
-[here](https://github.com/TamilanPeriyasamy/BundleDecompiler/tree/master/build/libs),
-save it as `BundleDecompiler.jar` in a directory included in `PATH` (e.g., in Ubuntu,
-`/usr/local/bin` or `/usr/bin`) and make sure it has the executable flag set.
+Do not use Obfuscapk to hide malware, bypass security products, evade app-store review, or interfere with systems you do not own or administer. Issues and pull requests aimed at improving security research, reproducibility, compatibility and legitimate application protection are welcome.
 
-> [!IMPORTANT]
-> BundleDecompiler doesn't work on Windows yet, so app bundle obfuscation is not
-> supported by Obfuscapk on Windows platform. Also, app bundle support is still in early
-> development, so if you faced any problems or if you want to help us improve, please see
-> [contributing](#-contributing).
+## Features
 
+- Black-box Android app obfuscation: no access to source code is required.
+- Modular plugin architecture based on independent obfuscators.
+- Transformations for code, identifiers, strings, resources, native libraries and packaging metadata.
+- Configurable obfuscator order through command line options.
+- Support for APK files and experimental support for Android App Bundles (`.aab`).
+- Docker and Docker Compose environment for reproducible execution.
+- Custom signing support through user-provided keystores.
 
+## Supported inputs
 
-## ❱ Publication
+| Format | Status | Notes |
+| --- | --- | --- |
+| `.apk` | Supported | Main target format. |
+| `.aab` | Experimental | Requires `BundleDecompiler.jar`; not supported on Windows by BundleDecompiler at the time of writing. |
 
-More details about **Obfuscapk** can be found in the paper
-"[Obfuscapk: An *open-source* black-box obfuscation tool for Android apps](https://doi.org/10.1016/j.softx.2020.100403)".
-You can cite the paper as follows:
+A successful obfuscation process means that Obfuscapk completed the transformation and produced an output package. It does not guarantee that the transformed application behaves exactly like the original one. Some applications use anti-tampering, integrity checks, dynamic loading, native code, resource assumptions or framework-specific patterns that can make repackaging and obfuscation fail.
 
-```BibTeX
+## Publication
+
+More details about Obfuscapk can be found in the paper:
+
+> Simone Aonzo, Gabriel Claudiu Georgiu, Luca Verderame, Alessio Merlo, "Obfuscapk: An open-source black-box obfuscation tool for Android apps", SoftwareX, Volume 11, 2020, 100403.
+
+Please cite Obfuscapk as follows:
+
+```bibtex
 @article{aonzo2020obfuscapk,
-    title = "Obfuscapk: An open-source black-box obfuscation tool for Android apps",
-    journal = "SoftwareX",
-    volume = "11",
-    pages = "100403",
-    year = "2020",
-    issn = "2352-7110",
-    doi = "https://doi.org/10.1016/j.softx.2020.100403",
-    url = "https://www.sciencedirect.com/science/article/pii/S2352711019302791",
-    author = "Simone Aonzo and Gabriel Claudiu Georgiu and Luca Verderame and Alessio Merlo",
-    keywords = "Android, Obfuscation, Program analysis"
+  title = {Obfuscapk: An open-source black-box obfuscation tool for Android apps},
+  journal = {SoftwareX},
+  volume = {11},
+  pages = {100403},
+  year = {2020},
+  issn = {2352-7110},
+  doi = {https://doi.org/10.1016/j.softx.2020.100403},
+  url = {https://www.sciencedirect.com/science/article/pii/S2352711019302791},
+  author = {Simone Aonzo and Gabriel Claudiu Georgiu and Luca Verderame and Alessio Merlo},
+  keywords = {Android, Obfuscation, Program analysis}
 }
 ```
 
+## Architecture
 
+<p align="center">
+  <img src="docs/architecture/architecture.png" alt="Obfuscapk architecture" width="720">
+</p>
 
-## ❱ Demo
+Obfuscapk is designed around a plugin system. Each obfuscation technique is implemented as a plugin that inherits from the base obfuscator class and implements the `obfuscate` method.
 
-![Demo](https://raw.githubusercontent.com/ClaudiuGeorgiu/Obfuscapk/master/docs/demo/cli.gif)
+During execution, Obfuscapk creates an obfuscation object that stores the paths, intermediate state, configuration and metadata needed by the active plugins. The object is passed to each selected obfuscator in sequence. The list and order of active obfuscators are specified through command line options.
 
+To add a new obfuscator:
 
+1. Create a new directory under `src/obfuscapk/obfuscators/`.
+2. Implement the obfuscator logic by following the structure of an existing simple plugin such as `Nop`.
+3. Add the corresponding `.obfuscator` plugin metadata file.
+4. Run `python3 -m obfuscapk.cli --help` to verify that the new plugin is discovered.
 
-## ❱ Architecture
+## Installation
 
-![Architecture](https://raw.githubusercontent.com/ClaudiuGeorgiu/Obfuscapk/master/docs/architecture/architecture.png)
+There are two recommended installation paths:
 
-Obfuscapk is designed to be modular and easy to extend, so it's built using a
-[plugin system](https://github.com/tibonihoo/yapsy). Consequently, every obfuscator is
-a plugin that inherits from an abstract
-[base class](https://github.com/ClaudiuGeorgiu/Obfuscapk/blob/master/src/obfuscapk/obfuscator_category.py)
-and needs to implement the method `obfuscate`. When the tool starts processing a new
-Android application file, it creates an
-[obfuscation object](https://github.com/ClaudiuGeorgiu/Obfuscapk/blob/master/src/obfuscapk/obfuscation.py)
-to store all the needed information (e.g., the location of the decompiled `smali` code)
-and the internal state of the operations (e.g., the list of already used obfuscators).
-Then the obfuscation object is passed, as a parameter to the `obfuscate` method, to all
-the active plugins/obfuscators (in sequence) to be processed and modified. The list and
-the order of the active plugins is specified through [command line options](#-usage).
+- Docker Compose, recommended for reproducible experiments.
+- Source installation, useful for development and for adding new obfuscators.
 
-The tool is easily extensible with new obfuscators: it's enough to add the source code
-implementing the obfuscation technique and the plugin metadata (a
-`<obfuscator-name>.obfuscator` file) in the
-[`src/obfuscapk/obfuscators`](https://github.com/ClaudiuGeorgiu/Obfuscapk/tree/master/src/obfuscapk/obfuscators)
-directory (take a simple existing obfuscator like
-[`Nop`](https://github.com/ClaudiuGeorgiu/Obfuscapk/blob/master/src/obfuscapk/obfuscators/nop/nop.py)
-as a starting example). The tool will detect automatically the new plugin, so no
-further configuration is needed (the new plugin will be treated like all the other
-plugins bundled with the tool).
+### Docker Compose
 
+Docker Compose builds a local image from this repository and mounts two host directories:
 
+- `./apks` as `/workdir`, for input applications.
+- `./output` as `/output`, for obfuscated applications.
 
-## ❱ Installation
+```bash
+git clone https://github.com/Mobile-IoT-Security-Lab/Obfuscapk.git
+cd Obfuscapk
+mkdir -p apks output
 
-There are two ways of getting a working copy of Obfuscapk on your own computer: either
-by [using Docker](#docker-image) or by [using directly the source code](#from-source)
-in a `Python 3` environment. In both cases, the first thing to do is to get a local
-copy of this repository, so open up a terminal in the directory where you want to save
-the project and clone the repository:
-
-```Shell
-$ git clone https://github.com/ClaudiuGeorgiu/Obfuscapk.git
+docker compose build
+docker compose run --rm obfuscapk --help
 ```
 
-### Docker image
+Place the input APK or AAB inside `./apks`, then run Obfuscapk through Docker Compose:
 
-----------------------------------------------------------------------------------------
-
-#### Prerequisites
-
-This is the suggested way of installing Obfuscapk, since the only requirement is to
-have a recent version of Docker installed:
-
-```Shell
-$ docker --version
-Docker version 20.10.21, build baeda1f
+```bash
+docker compose run --rm obfuscapk \
+  -o DebugRemoval \
+  -o ConstStringEncryption \
+  -o Rebuild \
+  -o NewAlignment \
+  -o NewSignature \
+  --cleanup \
+  --output-dir /output \
+  original.apk
 ```
 
-#### Official Docker Hub image
+The obfuscated output will be written to `./output`.
 
-The [official Obfuscapk Docker image](https://hub.docker.com/r/claudiugeorgiu/obfuscapk)
-is available on Docker Hub (automatically built from this repository):
+If file ownership matters on Linux or WSL, you can pass the current UID and GID explicitly:
 
-```Shell
-$ # Download the Docker image.
-$ docker pull claudiugeorgiu/obfuscapk
-$ # Give it a shorter name.
-$ docker tag claudiugeorgiu/obfuscapk obfuscapk
+```bash
+UID=$(id -u) GID=$(id -g) docker compose run --rm obfuscapk --help
 ```
 
-#### Install
+### Local Docker image
 
-If you downloaded the official image from Docker Hub, you are ready to use the tool so
-go ahead and check the [usage instructions](#-usage), otherwise execute the following
-command in the previously created `Obfuscapk/src/` directory (the folder containing the
-`Dockerfile`) to build the Docker image:
+You can also build and run the image directly with Docker:
 
-```Shell
-$ # Make sure to run the command in Obfuscapk/src/ directory.
-$ # It will take some time to download and install all the dependencies.
-$ docker build -t obfuscapk .
+```bash
+git clone https://github.com/Mobile-IoT-Security-Lab/Obfuscapk.git
+cd Obfuscapk
+mkdir -p apks output
+
+docker build -t obfuscapk .
+docker run --rm -it -v "${PWD}/apks":/workdir -v "${PWD}/output":/output obfuscapk --help
 ```
 
-When the Docker image is ready, make a quick test to check that everything was
-installed correctly:
+Example:
 
-```Shell
-$ docker run --rm -it obfuscapk --help
-usage: python3 -m obfuscapk.cli [-h] -o OBFUSCATOR [-w DIR] [-d OUT_APK_OR_AAB]
-...
+```bash
+docker run --rm -it \
+  -v "${PWD}/apks":/workdir \
+  -v "${PWD}/output":/output \
+  obfuscapk \
+  -o Nop \
+  -o Rebuild \
+  -o NewAlignment \
+  -o NewSignature \
+  --cleanup \
+  original.apk
 ```
 
-Obfuscapk is now ready to be used, see the [usage instructions](#-usage) for more
-information.
+A legacy Docker Hub image may still exist under the original namespace. For this maintained fork, prefer building the Docker image from the current repository unless a new official image is explicitly published by the maintainers.
 
 ### From source
 
-----------------------------------------------------------------------------------------
+Install the external tools required by Obfuscapk and make sure they are available from the command line:
 
-#### Prerequisites
+- [`apktool`](https://ibotpeaches.github.io/Apktool/)
+- [`apksigner`](https://developer.android.com/studio/command-line/apksigner)
+- [`zipalign`](https://developer.android.com/studio/command-line/zipalign)
+- Java runtime
+- optionally, [`BundleDecompiler`](https://github.com/TamilanPeriyasamy/BundleDecompiler) for AAB support
 
-Make sure to have a recent version of
-[`apktool`](https://ibotpeaches.github.io/Apktool/),
-[`apksigner`](https://developer.android.com/studio/command-line/apksigner)
-and [`zipalign`](https://developer.android.com/studio/command-line/zipalign) installed
-and available from the command line:
+`zipalign` and `apksigner` are included in the Android SDK Build Tools.
 
-```Shell
-$ apktool
-Apktool v2.9.3 - a tool for reengineering Android apk files
-...
-```
-```Shell
-$ apksigner
-Usage:  apksigner <command> [options]
-        apksigner --version
-        apksigner --help
-...
-```
-```Shell
-$ zipalign
-Zip alignment utility
-Copyright (C) 2009 The Android Open Source Project
-...
+The location of the external tools can be customized with environment variables:
+
+```bash
+export APKTOOL_PATH=/custom/path/apktool
+export BUNDLE_DECOMPILER_PATH=/custom/path/BundleDecompiler.jar
+export APKSIGNER_PATH=/custom/path/apksigner
+export ZIPALIGN_PATH=/custom/path/zipalign
 ```
 
-To support app bundles obfuscation you also need
-[BundleDecompiler](https://github.com/TamilanPeriyasamy/BundleDecompiler), so download
-the latest available version from
-[here](https://github.com/TamilanPeriyasamy/BundleDecompiler/tree/master/build/libs),
-save it as `BundleDecompiler.jar` in a directory included in `PATH` (e.g., in Ubuntu,
-`/usr/local/bin` or `/usr/bin`) and make sure it has the executable flag set.
+Install the Python dependencies:
 
-To use BundleDecompiler(0.0.2) and `apktool`(v.2.9.3) you also need a recent version of Java. 
-`zipalign` and `apksigner` are included in the Android SDK. The location of the
-executables can also be specified through the following environment variables:
-`APKTOOL_PATH`, `BUNDLE_DECOMPILER_PATH`, `APKSIGNER_PATH` and `ZIPALIGN_PATH` (e.g.,
-in Ubuntu, run `export APKTOOL_PATH=/custom/location/apktool` before running Obfuscapk
-in the same terminal).
+```bash
+git clone https://github.com/Mobile-IoT-Security-Lab/Obfuscapk.git
+cd Obfuscapk
 
-Apart from the above tools, the only requirement of this project is a working
-`Python 3` (at least `3.7`) installation (along with its package manager `pip`).
+python3 -m venv venv
+source venv/bin/activate
+python3 -m pip install -r src/requirements.txt
 
-#### Install
-
-Run the following commands in the main directory of the project (`Obfuscapk/`) to
-install the needed dependencies:
-
-```Shell
-$ # Make sure to run the commands in Obfuscapk/ directory.
-
-$ # The usage of a virtual environment is highly recommended.
-$ python3 -m venv venv
-$ source venv/bin/activate
-
-$ # Install Obfuscapk's requirements.
-$ python3 -m pip install -r src/requirements.txt
+cd src
+python3 -m obfuscapk.cli --help
 ```
 
-After the requirements are installed, make a quick test to check that everything works
-correctly:
+When running from source, execute Obfuscapk from the `src/` directory or add `Obfuscapk/src` to `PYTHONPATH`.
 
-```Shell
-$ cd src/
-$ # The following command has to be executed always from Obfuscapk/src/ directory
-$ # or by adding Obfuscapk/src/ directory to PYTHONPATH environment variable.
-$ python3 -m obfuscapk.cli --help
-usage: python3 -m obfuscapk.cli [-h] -o OBFUSCATOR [-w DIR] [-d OUT_APK_OR_AAB]
-...
+## Android App Bundle support
+
+Obfuscapk includes experimental support for Android App Bundles (`.aab`) by using `BundleDecompiler.jar`.
+
+To enable AAB support in a source installation:
+
+1. Download the latest available `BundleDecompiler.jar` from the BundleDecompiler project.
+2. Save it in a directory included in `PATH`, for example `/usr/local/bin`.
+3. Ensure it is executable.
+4. Alternatively, set `BUNDLE_DECOMPILER_PATH` to its location.
+
+Example:
+
+```bash
+export BUNDLE_DECOMPILER_PATH=/usr/local/bin/BundleDecompiler.jar
 ```
 
-Obfuscapk is now ready to be used, see the [usage instructions](#-usage) for more
-information.
+AAB support should be considered experimental. Validate the output package carefully, especially when working with modern Android projects, split configurations, dynamic features or non-standard build pipelines.
 
+## Usage
 
+The general command format is:
 
-## ❱ Usage
-
-From now on, Obfuscapk will be considered as an executable available as `obfuscapk`,
-so you need to adapt the commands according to how you installed the tool:
-
-* **Docker image**: a local directory containing the application to obfuscate has to be
-mounted to `/workdir` in the container (e.g., the current directory `"${PWD}"`), so the
-command:
-    ```Shell
-    $ obfuscapk [params...]
-    ```
-    becomes:
-    ```Shell
-    $ docker run --rm -it -u $(id -u):$(id -g) -v "${PWD}":"/workdir" obfuscapk [params...]
-    ```
-
-* **From source**: every instruction has to be executed from the `Obfuscapk/src/`
-directory (or by adding `Obfuscapk/src/` directory to `PYTHONPATH` environment
-variable) and the command:
-    ```Shell
-    $ obfuscapk [params...]
-    ```
-    becomes:
-    ```Shell
-    $ python3 -m obfuscapk.cli [params...]
-    ```
-
-Let's start by looking at the help message:
-
-```Shell
-$ obfuscapk --help
-obfuscapk [-h] -o OBFUSCATOR [-w DIR] [-d OUT_APK_OR_AAB] [-i] [-p] [-k VT_API_KEY]
-          [--keystore-file KEYSTORE_FILE] [--keystore-password KEYSTORE_PASSWORD]
-          [--key-alias KEY_ALIAS] [--key-password KEY_PASSWORD] [--use-aapt2]
-          <APK_OR_BUNDLE_FILE>
+```bash
+obfuscapk -o OBFUSCATOR [-o OBFUSCATOR ...] [options] APK_OR_AAB_FILE
 ```
 
-There are two mandatory parameters: `<APK_OR_BUNDLE_FILE>`, the path (relative or
-absolute) to the apk or app bundle file to obfuscate and the list with the names of the
-obfuscation techniques to apply (specified with a `-o` option that can be used multiple
-times, e.g., `-o Rebuild -o NewAlignment -o NewSignature`). The other optional arguments
-are as follows:
+Depending on the installation method, replace `obfuscapk` with one of the following:
 
-* `-w DIR` is used to set the working directory where to save the intermediate files
-(generated by `apktool`). If not specified, a directory named `obfuscation_working_dir`
-is created in the same directory as the input application. This can be useful for
-debugging purposes, but if it's not needed it can be set to a temporary directory
-(e.g., `-w /tmp/`).
+```bash
+# Docker Compose
+docker compose run --rm obfuscapk [options] APK_OR_AAB_FILE
 
-* `-d OUT_APK_OR_AAB` is used to set the path of the destination file: the apk file
-generated by the obfuscation process (e.g., `-d /home/user/Desktop/obfuscated.apk` or
-`-d /home/user/Desktop/obfuscated.aab`). If not specified, the final obfuscated file
-will be saved inside the working directory. Note: existing files will be overwritten
-without any warning.
+# Docker
+docker run --rm -it -v "${PWD}/apks":/workdir -v "${PWD}/output":/output obfuscapk [options] APK_OR_AAB_FILE
 
-* `-i` is a flag for ignoring known third party libraries during the obfuscation
-process, to use fewer resources, to increase performances and to reduce the risk of
-errors. The
-[list of libraries](https://github.com/ClaudiuGeorgiu/Obfuscapk/blob/master/src/obfuscapk/resources/libs_to_ignore.txt)
-to ignore is adapted from [LiteRadar](https://github.com/pkumza/LiteRadar) project.
-
-* `-p` is a flag for showing progress bars during the obfuscation operations. When
-using the tool in batch operations/automatic builds it's convenient to have progress
-bars disabled, otherwise this flag should be enabled to see the obfuscation progress.
-
-* `-k VT_API_KEY` is needed only when using `VirusTotal` obfuscator, to set the API
-key to be used when communicating with Virus Total.
-
-* `--keystore-file KEYSTORE_FILE`, `--keystore-password KEYSTORE_PASSWORD`,
-`--key-alias KEY_ALIAS` and `--key-password KEY_PASSWORD` can be used to specify a
-custom keystore (needed for the apk signing). If `--keystore-file` is used,
-`--keystore-password` and `--key-alias` must be specified too, while `--key-password`
-is needed only if the chosen key has a different password from the keystore password.
-By default (when `--keystore-file` is not specified), a
-[keystore bundled with Obfuscapk](https://github.com/ClaudiuGeorgiu/Obfuscapk/blob/master/src/obfuscapk/resources/obfuscation_keystore.jks)
-is used for the signing operations.
-
-* `--ignore-packages-file IGNORE_PACKAGES_FILE` is a path to a file which includes
-package names to be ignored. All the classes inside those packages will not be
-obfuscated when this option is used. The file should have one package name per line as
-shown in the example below:
-    ```
-    com.mycompany.dontobfuscate
-    com.mycompany.ignore
-    ...
-    ```
-* `--use-aapt2` is a flag for using aapt2 option when rebuilding an app with `apktool`.
-
-Let's consider now a simple working example to see how Obfuscapk works:
-
-```Shell
-$ # original.apk is a valid Android apk file.
-$ obfuscapk -o RandomManifest -o Rebuild -o NewAlignment -o NewSignature original.apk
+# From source, inside Obfuscapk/src
+python3 -m obfuscapk.cli [options] APK_OR_AAB_FILE
 ```
 
-When running the above command, this is what happens behind the scenes:
+### Common examples
+
+Minimal repackaging test:
+
+```bash
+obfuscapk \
+  -o Rebuild \
+  -o NewAlignment \
+  -o NewSignature \
+  original.apk
+```
+
+Basic obfuscation:
+
+```bash
+obfuscapk \
+  -o DebugRemoval \
+  -o Nop \
+  -o ConstStringEncryption \
+  -o Rebuild \
+  -o NewAlignment \
+  -o NewSignature \
+  original.apk
+```
+
+More aggressive obfuscation:
+
+```bash
+obfuscapk \
+  -o DebugRemoval \
+  -o LibEncryption \
+  -o CallIndirection \
+  -o MethodRename \
+  -o AssetEncryption \
+  -o MethodOverload \
+  -o ConstStringEncryption \
+  -o ResStringEncryption \
+  -o ArithmeticBranch \
+  -o FieldRename \
+  -o Nop \
+  -o Goto \
+  -o ClassRename \
+  -o Reflection \
+  -o AdvancedReflection \
+  -o Reorder \
+  -o RandomManifest \
+  -o Rebuild \
+  -o NewAlignment \
+  -o NewSignature \
+  --cleanup \
+  original.apk
+```
+
+Always keep `Rebuild`, `NewAlignment` and `NewSignature` after the transformation obfuscators. They are not obfuscation techniques by themselves, but they are needed to build, align and sign the output package.
+
+### Options
+
+| Option | Description |
+| --- | --- |
+| `-o`, `--obfuscator OBFUSCATOR` | Select an obfuscator. Can be specified multiple times. Order matters. |
+| `-w`, `--working-dir DIR` | Directory for intermediate files. Created automatically if missing. |
+| `-d`, `--destination OUT_APK_OR_AAB` | Explicit output file path. Existing files can be overwritten. |
+| `-i`, `--ignore-libs` | Skip known third-party libraries during obfuscation. |
+| `-p`, `--show-progress` | Show progress bars during obfuscation. |
+| `--ignore-packages-file FILE` | File containing package names to ignore, one package per line. |
+| `--use-aapt2` | Use `aapt2` when rebuilding with apktool. |
+| `--cleanup` | Remove the intermediate working directory after a successful run. |
+| `--output-dir DIR` | Move the final output package to the selected directory. Defaults to `/output` in the Docker workflow. |
+| `--keystore-file FILE` | Custom keystore for signing the output APK. |
+| `--keystore-password PASSWORD` | Password for the custom keystore. |
+| `--key-alias ALIAS` | Alias of the key inside the custom keystore. |
+| `--key-password PASSWORD` | Password of the selected key, if different from the keystore password. |
+| `-k`, `--virus-total-key VT_API_KEY` | API key used only by the `VirusTotal` plugin. |
+
+When no custom keystore is provided, Obfuscapk uses the test keystore bundled with the project. Use a custom keystore when the signature matters for your experiment or test workflow.
+
+To ignore custom packages, create a file such as `ignore-packages.txt`:
+
+```text
+com.example.do_not_obfuscate
+com.vendor.ignore
+```
+
+Then run:
+
+```bash
+obfuscapk --ignore-packages-file ignore-packages.txt -o Rebuild -o NewAlignment -o NewSignature original.apk
+```
+
+## Obfuscators
+
+The obfuscators bundled with Obfuscapk are grouped into categories:
+
+- `Trivial`: build, alignment and signing operations needed by the pipeline.
+- `Rename`: identifier renaming for classes, methods and fields.
+- `Encryption`: encryption of strings, resources, assets or native libraries.
+- `Code`: transformations that modify the decompiled smali code.
+- `Resources`: transformations on resources and manifest files.
+- `Other`: auxiliary plugins.
+
+| Obfuscator | Category | Description |
+| --- | --- | --- |
+| `AdvancedReflection` | Code | Uses reflection to invoke selected Android framework APIs. |
+| `ArithmeticBranch` | Code | Inserts arithmetic junk code and opaque branches that are not expected to be taken. |
+| `AssetEncryption` | Encryption | Encrypts asset files and adds runtime support for their use. |
+| `CallIndirection` | Code | Replaces direct method invocations with wrapper methods. |
+| `ClassRename` | Rename | Changes package names and renames classes, including manifest references. |
+| `ConstStringEncryption` | Encryption | Encrypts constant strings in code. |
+| `DebugRemoval` | Code | Removes debug information from smali code. |
+| `FieldRename` | Rename | Renames fields. |
+| `Goto` | Code | Adds `goto` instructions to modify the control-flow graph. |
+| `LibEncryption` | Encryption | Encrypts native libraries when compatible with the loading pattern. |
+| `MethodOverload` | Code | Adds overloaded methods with additional random arguments and junk instructions. |
+| `MethodRename` | Rename | Renames methods. |
+| `NewAlignment` | Trivial | Aligns the output package with `zipalign`. |
+| `NewSignature` | Trivial | Signs the output package. |
+| `Nop` | Code | Inserts random `nop` instructions. |
+| `RandomManifest` | Resources | Randomly reorders entries in the Android manifest without breaking XML structure. |
+| `Rebuild` | Trivial | Rebuilds the application package. |
+| `Reflection` | Code | Redirects suitable app method invocations through Java reflection. |
+| `Reorder` | Code | Reorders basic blocks and adjusts branches using `goto` instructions. |
+| `ResStringEncryption` | Encryption | Encrypts strings in resources that are referenced from code. |
+| `VirusTotal` | Other | Submits selected artifacts to VirusTotal. Requires an API key. Do not use it with confidential applications unless you are authorized to upload them. |
 
-* since no working directory was specified, a new working directory
-(`obfuscation_working_dir`) is created in the same location as `original.apk` (this can
-be useful to inspect the `smali` files/manifest/resources in case of errors)
+Not every plugin is a pure obfuscation technique. `Rebuild`, `NewAlignment`, `NewSignature` and `VirusTotal` are implemented as plugins to keep the pipeline modular.
 
-* some checks are performed to make sure that all the needed files/executables are
-available and ready to be used
+## Troubleshooting
 
-* the actual obfuscation process begins: the specified obfuscators are executed
-(in order) one by one until there's no obfuscator left or until an error is encountered
+### Start with a minimal rebuild
 
-    - when running the first obfuscator, `original.apk` is decompiled with `apktool`
-    and the results are stored into the working directory
+Before combining several transformations, verify that the application can be repackaged:
 
-    - since the first obfuscator is `RandomManifest`, the entries in the decompiled
-    Android manifest are reordered randomly (without breaking the `xml` structures)
+```bash
+obfuscapk -o Rebuild -o NewAlignment -o NewSignature original.apk
+```
 
-    - `Rebuild` obfuscator simply rebuilds the application (now with the modified
-    manifest) using `apktool`, and since no output file was specified, the resulting
-    apk file is saved in the working directory created before
+If this fails, the issue is likely related to decompilation, rebuilding, signing, anti-tampering logic, tool versions or application-specific packaging assumptions.
 
-    - `NewAlignment` obfuscator uses `zipalign` tool to align the resulting apk file
-      
-    - `NewSignature` obfuscator signs the newly created apk file with a custom 
-      certificate contained in a
-      [keystore bundled with Obfuscapk](https://github.com/ClaudiuGeorgiu/Obfuscapk/blob/master/src/obfuscapk/resources/obfuscation_keystore.jks)
-      (though a different keystore can be specified with the `--keystore-file` parameter)
+### Add obfuscators incrementally
 
-* when all the obfuscators have been executed without errors, the resulting obfuscated
-apk file can be found in `obfuscation_working_dir/original_obfuscated.apk`, signed,
-aligned and ready to be installed into a device/emulator
+If minimal repackaging works but a larger configuration fails, add obfuscators one by one until the problematic transformation is isolated. The order of obfuscators matters.
 
-As seen in the previous example, `Rebuild`, `NewAlignment` and `NewSignature` 
-obfuscators are always needed to complete an obfuscation operation, to build the final
-obfuscated apk. They are not actual obfuscation techniques, but they are needed in the
-build process, so they are included in the list of obfuscators to keep the overall
-architecture modular.
+### Enable logs
 
-Not working as expected? See
-[FAQ](https://github.com/ClaudiuGeorgiu/Obfuscapk/blob/master/docs/FAQ.md) and
-[troubleshooting](https://github.com/ClaudiuGeorgiu/Obfuscapk/blob/master/docs/TROUBLESHOOTING.md).
+By default, Obfuscapk prints only error messages. To enable debug logging:
 
+```bash
+LOG_LEVEL=DEBUG obfuscapk -o Rebuild -o NewAlignment -o NewSignature original.apk
+```
 
+With Docker Compose:
 
-## ❱ Obfuscators
+```bash
+LOG_LEVEL=DEBUG docker compose run --rm obfuscapk -o Rebuild -o NewAlignment -o NewSignature original.apk
+```
 
-The obfuscators included in Obfuscapk can be divided into different categories,
-depending on the operations they perform:
+### Common causes of failure
 
-* **Trivial**: as the name suggests, this category includes simple operations (that
-do not modify much the original application), like signing the apk file with a new
-signature.
+- Old `apktool` versions.
+- Missing `apksigner` or `zipalign`.
+- Missing or incompatible Java runtime.
+- AAB processing without `BundleDecompiler.jar`.
+- Applications protected by anti-repackaging or integrity checks.
+- Transformations applied to third-party libraries that should be ignored.
+- Obfuscator ordering issues.
 
-* **Rename**: operations that change the names of the used identifiers (classes, fields,
-methods).
+For more details, see [`docs/FAQ.md`](docs/FAQ.md) and [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md).
 
-* **Encryption**: packaging encrypted code/resources and decrypting them during the app
-execution. When Obfuscapk starts, it automatically generates a random secret key (32
-characters long, using ASCII letters and digits) that will be used for encryption.
+## Contributing
 
-* **Code**: all the operations that involve the modification of the decompiled source
-code.
+Contributions are welcome. Useful contributions include:
 
-* **Resources**: operations on the resource files (like modifying the manifest).
+- Bug fixes for APK or AAB processing.
+- Compatibility improvements for recent Android build tools.
+- New obfuscation plugins.
+- De-obfuscation and detection benchmarks.
+- Documentation updates.
+- Reproducible test cases.
 
-* **Other**
+Before opening an issue, please include:
 
-The obfuscators currently bundled with Obfuscapk are briefly presented below (in
-alphabetical order). Please refer to the source code of the project for more details.
+- Operating system and installation method.
+- Obfuscapk commit hash.
+- Python version.
+- `apktool`, `apksigner`, `zipalign` and Java versions.
+- Full command line used.
+- List and order of obfuscators.
+- Whether minimal repackaging works.
+- Debug logs when possible.
 
-> [!TIP]
-> Not all the obfuscators below correspond to real obfuscation techniques (e.g.,
-> `Rebuild`, `NewAlignment`, `NewSignature` and `VirusTotal`), but they are implemented
-> as obfuscators to keep the architecture modular and easy to extend with new
-> functionality.
+Open issues and pull requests in this repository:
 
+- Issues: https://github.com/Mobile-IoT-Security-Lab/Obfuscapk/issues
+- Pull requests: https://github.com/Mobile-IoT-Security-Lab/Obfuscapk/pulls
 
-<details><summary><b>AdvancedReflection</b> [Code]</summary>
+## License
 
-> Uses reflection to invoke dangerous APIs of the Android Framework. To find out if a
-> method belongs to the Android Framework, Obfuscapk refers to the mapping discovered by
-> [Backes et al](https://www.usenix.org/system/files/conference/usenixsecurity16/sec16_paper_backes-android.pdf).  
-> [:page_facing_up: AdvancedReflection source code](https://github.com/ClaudiuGeorgiu/Obfuscapk/tree/master/src/obfuscapk/obfuscators/advanced_reflection)
-</details>
+Obfuscapk is released under the [MIT License](LICENSE).
 
+## Credits
 
-<details><summary><b>ArithmeticBranch</b> [Code]</summary>
+Obfuscapk was originally developed for research purposes at the Computer Security Lab, hosted at DIBRIS, University of Genoa.
 
-> Insert junk code. In this case, the junk code is composed by arithmetic computations
-> and a branch instruction depending on the result of these computations, crafted in
-> such a way that the branch is never taken.  
-> [:page_facing_up: ArithmeticBranch source code](https://github.com/ClaudiuGeorgiu/Obfuscapk/tree/master/src/obfuscapk/obfuscators/arithmetic_branch)
-</details>
+Original authors:
 
+- Simone Aonzo
+- Gabriel Claudiu Georgiu
+- Luca Verderame
+- Alessio Merlo
 
-<details><summary><b>AssetEncryption</b> [Encryption]</summary>
-
-> Encrypt asset files.  
-> [:page_facing_up: AssetEncryption source code](https://github.com/ClaudiuGeorgiu/Obfuscapk/tree/master/src/obfuscapk/obfuscators/asset_encryption)
-</details>
-
-
-<details><summary><b>CallIndirection</b> [Code]</summary>
-
-> This technique modifies the control-flow graph without impacting the code semantics:
-> it adds new methods that invoke the original ones. For example, an invocation to the
-> method *m1* will be substituted by a new wrapper method *m2*, that, when invoked, it
-> calls the original method *m1*.  
-> [:page_facing_up: CallIndirection source code](https://github.com/ClaudiuGeorgiu/Obfuscapk/tree/master/src/obfuscapk/obfuscators/call_indirection)
-</details>
-
-
-<details><summary><b>ClassRename</b> [Rename]</summary>
-
-> Change the package name and rename classes (even in the manifest file).  
-> [:page_facing_up: ClassRename source code](https://github.com/ClaudiuGeorgiu/Obfuscapk/tree/master/src/obfuscapk/obfuscators/class_rename)
-</details>
-
-
-<details><summary><b>ConstStringEncryption</b> [Encryption]</summary>
-
-> Encrypt constant strings in code.  
-> [:page_facing_up: ConstStringEncryption source code](https://github.com/ClaudiuGeorgiu/Obfuscapk/tree/master/src/obfuscapk/obfuscators/const_string_encryption)
-</details>
-
-
-<details><summary><b>DebugRemoval</b> [Code]</summary>
-
-> Remove debug information.  
-> [:page_facing_up: DebugRemoval source code](https://github.com/ClaudiuGeorgiu/Obfuscapk/tree/master/src/obfuscapk/obfuscators/debug_removal)
-</details>
-
-
-<details><summary><b>FieldRename</b> [Rename]</summary>
-
-> Rename fields.  
-> [:page_facing_up: FieldRename source code](https://github.com/ClaudiuGeorgiu/Obfuscapk/tree/master/src/obfuscapk/obfuscators/field_rename)
-</details>
-
-
-<details><summary><b>Goto</b> [Code]</summary>
-
-> Given a method, it inserts a `goto` instruction pointing to the end of the method and
-> another `goto` pointing to the instruction after the first `goto`; it modifies the
-> control-flow graph by adding two new nodes.  
-> [:page_facing_up: Goto source code](https://github.com/ClaudiuGeorgiu/Obfuscapk/tree/master/src/obfuscapk/obfuscators/goto)
-</details>
-
-
-<details><summary><b>LibEncryption</b> [Encryption]</summary>
-
-> Encrypt native libs.  
-> [:page_facing_up: LibEncryption source code](https://github.com/ClaudiuGeorgiu/Obfuscapk/tree/master/src/obfuscapk/obfuscators/lib_encryption)
-</details>
-
-
-<details><summary><b>MethodOverload</b> [Code]</summary>
-
-> It exploits the overloading feature of the Java programming language to assign the
-> same name to different methods but using different arguments. Given an already
-> existing method, this technique creates a new void method with the same name and
-> arguments, but it also adds new random arguments. Then, the body of the new method
-> is filled with random arithmetic instructions.  
-> [:page_facing_up: MethodOverload source code](https://github.com/ClaudiuGeorgiu/Obfuscapk/tree/master/src/obfuscapk/obfuscators/method_overload)
-</details>
-
-
-<details><summary><b>MethodRename</b> [Rename]</summary>
-
-> Rename methods.  
-> [:page_facing_up: MethodRename source code](https://github.com/ClaudiuGeorgiu/Obfuscapk/tree/master/src/obfuscapk/obfuscators/method_rename)
-</details>
-
-
-<details><summary><b>NewAlignment</b> [Trivial]</summary>
-
-> Realign the application.  
-> [:page_facing_up: NewAlignment source code](https://github.com/ClaudiuGeorgiu/Obfuscapk/tree/master/src/obfuscapk/obfuscators/new_alignment)
-</details>
-
-
-<details><summary><b>NewSignature</b> [Trivial]</summary>
-
-> Re-sign the application with a new custom signature.  
-> [:page_facing_up: NewSignature source code](https://github.com/ClaudiuGeorgiu/Obfuscapk/tree/master/src/obfuscapk/obfuscators/new_signature)
-</details>
-
-
-<details><summary><b>Nop</b> [Code]</summary>
-
-> Insert junk code. Nop, short for *no-operation*, is a dedicated instruction that does
-> nothing. This technique just inserts random `nop` instructions within every method
-> implementation.  
-> [:page_facing_up: Nop source code](https://github.com/ClaudiuGeorgiu/Obfuscapk/tree/master/src/obfuscapk/obfuscators/nop)
-</details>
-
-
-<details><summary><b>RandomManifest</b> [Resource]</summary>
-
-> Randomly reorder entries in the manifest file.  
-> [:page_facing_up: RandomManifest source code](https://github.com/ClaudiuGeorgiu/Obfuscapk/tree/master/src/obfuscapk/obfuscators/random_manifest)
-</details>
-
-
-<details><summary><b>Rebuild</b> [Trivial]</summary>
-
-> Rebuild the application.  
-> [:page_facing_up: Rebuild source code](https://github.com/ClaudiuGeorgiu/Obfuscapk/tree/master/src/obfuscapk/obfuscators/rebuild)
-</details>
-
-
-<details><summary><b>Reflection</b> [Code]</summary>
-
-> This technique analyzes the existing code looking for method invocations of the app,
-> ignoring the calls to the Android framework (see `AdvancedReflection`). If it finds
-> an instruction with a suitable method invocation (i.e., no constructor methods,
-> public visibility, enough free registers etc.) such invocation is redirected to a
-> custom method that will invoke the original method using the Reflection APIs.  
-> [:page_facing_up: Reflection source code](https://github.com/ClaudiuGeorgiu/Obfuscapk/tree/master/src/obfuscapk/obfuscators/reflection)
-</details>
-
-
-<details><summary><b>Reorder</b> [Code]</summary>
-
-> This technique consists of changing the order of basic blocks in the code. When a
-> branch instruction is found, the condition is inverted (e.g., *branch if lower than*,
-> becomes *branch if greater or equal than*) and the target basic blocks are reordered
-> accordingly. Furthermore, it also randomly re-arranges the code abusing `goto`
-> instructions.  
-> [:page_facing_up: Reorder source code](https://github.com/ClaudiuGeorgiu/Obfuscapk/tree/master/src/obfuscapk/obfuscators/reorder)
-</details>
-
-
-<details><summary><b>ResStringEncryption</b> [Encryption]</summary>
-
-> Encrypt strings in resources (only those called inside code).  
-> [:page_facing_up: ResStringEncryption source code](https://github.com/ClaudiuGeorgiu/Obfuscapk/tree/master/src/obfuscapk/obfuscators/res_string_encryption)
-</details>
-
-
-<details><summary><b>VirusTotal</b> [Other]</summary>
-
-> Send the original and the obfuscated application to Virus Total. You must provide
-> the VT API key (see `-k` option).  
-> [:page_facing_up: VirusTotal source code](https://github.com/ClaudiuGeorgiu/Obfuscapk/tree/master/src/obfuscapk/obfuscators/virus_total)
-</details>
-
-
-
-## ❱ License
-
-You are free to use this code under the
-[MIT License](https://github.com/ClaudiuGeorgiu/Obfuscapk/blob/master/LICENSE).
-
-
-
-## ❱ Credits
-
-[![Unige](https://intranet.dibris.unige.it/img/logo_unige.gif)](https://unige.it/en/)
-[![Dibris](https://intranet.dibris.unige.it/img/logo_dibris.gif)](https://www.dibris.unige.it/en/)
-
-This software was developed for research purposes at the Computer Security Lab
-([CSecLab](https://csec.it/)), hosted at DIBRIS, University of Genoa.
-
-
-
-## ❱ Team
-
-* [Simone Aonzo](https://simoneaonzo.it/) - Research Assistant
-* [Gabriel Claudiu Georgiu](https://github.com/ClaudiuGeorgiu) - Core Developer
-* [Luca Verderame](https://csec.it/people/luca_verderame/) - Postdoctoral Researcher
-* [Alessio Merlo](https://csec.it/people/alessio_merlo/) - Faculty Member
+Current maintenance and research development are coordinated through the Mobile-IoT-Security Lab fork.
